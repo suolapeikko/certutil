@@ -7,7 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		E4947CB7228D34980099EF3C /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4947CB6228D34980099EF3C /* main.swift */; };
+		E4947CBE228D6D7D0099EF3C /* CertificateUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4947CBD228D6D7D0099EF3C /* CertificateUtils.swift */; };
+		E4947CC0228D6E090099EF3C /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4947CBF228D6E080099EF3C /* main.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -24,7 +25,8 @@
 
 /* Begin PBXFileReference section */
 		E4947CB3228D34980099EF3C /* certutil */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = certutil; sourceTree = BUILT_PRODUCTS_DIR; };
-		E4947CB6228D34980099EF3C /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		E4947CBD228D6D7D0099EF3C /* CertificateUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CertificateUtils.swift; path = certutil/CertificateUtils.swift; sourceTree = "<group>"; };
+		E4947CBF228D6E080099EF3C /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = main.swift; path = certutil/main.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -41,7 +43,8 @@
 		E4947CAA228D34980099EF3C = {
 			isa = PBXGroup;
 			children = (
-				E4947CB5228D34980099EF3C /* certutil */,
+				E4947CBF228D6E080099EF3C /* main.swift */,
+				E4947CBD228D6D7D0099EF3C /* CertificateUtils.swift */,
 				E4947CB4228D34980099EF3C /* Products */,
 			);
 			sourceTree = "<group>";
@@ -52,14 +55,6 @@
 				E4947CB3228D34980099EF3C /* certutil */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		E4947CB5228D34980099EF3C /* certutil */ = {
-			isa = PBXGroup;
-			children = (
-				E4947CB6228D34980099EF3C /* main.swift */,
-			);
-			path = certutil;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -119,7 +114,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E4947CB7228D34980099EF3C /* main.swift in Sources */,
+				E4947CBE228D6D7D0099EF3C /* CertificateUtils.swift in Sources */,
+				E4947CC0228D6E090099EF3C /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
