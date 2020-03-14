@@ -24,3 +24,9 @@ The whole idea of the tool is to remove copies of the certificates that are not 
 
 `./certutil -count <name>` counts the number of certificates with the given full or substring of CN.
 
+Example:
+```
+antti@my-mbp ~ % certutil -verify "@antti.com"
+CN=antti@antti.com, Expiration: 14. Mar 2021 15:26:59 -> Keep
+CN=antti@antti.com, Expiration: 14. Mar 2021 15:26:44 -> Remove
+CN=antti@antti.com, Expiration: 14. Mar 2021 15:01:17 -> Remove
