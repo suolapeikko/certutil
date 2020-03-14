@@ -95,11 +95,15 @@ extension SecCertificate {
     /// Convert Double value (since 2001 / NSDate) to a Date
     /// - returns:
     ///     - Date: Date
-    func getDateFromIntSince2001(since2001: Double) -> Date {
+    func getDateFromIntSince2001(since2001: Double) -> String {
         
-        let date = NSDate(timeIntervalSinceReferenceDate: since2001)
+        let date = NSDate(timeIntervalSinceReferenceDate: since2001) as Date
+        let dateFormatter = DateFormatter()
         
-        return date as Date
+        dateFormatter.timeZone = TimeZone.current
+        dateFormatter.dateFormat = "d. MMM yyyy HH:mm:ss"
+
+        return dateFormatter.string(from: date)
     }
 }
 
@@ -151,7 +155,7 @@ struct CertificateUtils {
     ///   - [SecCertificate]: An array of SecCertificate objects
     func deleteOldestCertificates(certificates: [SecCertificate]) {
         
-        var sortedCertificates = sortCertificatesDescendingExpirationDate(certificates: certificates)
+        var sortedCertificates = certificates
         
         // If we have more than 1 certificate, we need to delete something
         if(sortedCertificates.count > 1) {
