@@ -10,7 +10,7 @@ certutil: Command line utility for listing and cleaning certificates from Keycha
    certutil -list <name>       List all certificates having <name> in CN
    certutil -verify <name>     List and verify all certificates having <name> in CN
    certutil -delete <name>     Delete all certificates except the latest one having <name> in CN
-   certutil -count <name>.     Count all certificates having <name> in CN
+   certutil -count <name>      Count all certificates having <name> in CN
 ```
 
 Options:
