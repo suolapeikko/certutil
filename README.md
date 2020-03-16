@@ -4,13 +4,16 @@ macOS command line tool for removing multiple copies of the same certificate fro
 Usage:
 ```
 $ ./certutil
-certutil: Command line utility for listing and cleaning certificates from Keychain
+certutil: Command line utility for listing and cleaning certificates from Keychain (Version 3.0)
 
    Usage:
-   certutil -list <name>       List all certificates having <name> in CN
-   certutil -verify <name>     List and verify all certificates having <name> in CN
-   certutil -delete <name>     Delete all certificates except the latest one having <name> in CN
-   certutil -count <name>      Count all certificates having <name> in CN
+   certutil -list <name>           List all certificates with <name> in CN
+   certutil -list_exp <name>       List all expired certificates with <name> in CN
+   certutil -verify <name>         List and verify all certificates with <name> in CN
+   certutil -delete <name>         Delete all certificates except the most recent one with <name> in CN
+   certutil -delete_exp <name>     Delete all expired certificates with <name> in CN
+   certutil -count <name>          Count all certificates with <name> in CN
+   certutil -count_exp <name>      Count all expired certificates with <name> in CN
 ```
 
 Options:
