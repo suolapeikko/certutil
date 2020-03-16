@@ -21,11 +21,17 @@ The whole idea of the tool is to remove copies of the certificates that are not 
 
 `./certutil -list <name>` searches keychain for all certificates which have name variable in their CN. For example, it will match both "Developer ID Application: Antti" and "Developer ID Installer: Antti". The idea of the tool is to not restrict user to do only exact matches.
 
+`./certutil -list_exp <name>` searches keychain for all expired certificates which have name variable in their CN. For example, it will match both "Developer ID Application: Antti" and "Developer ID Installer: Antti". The idea of the tool is to not restrict user to do only exact matches.
+
 `./certutil -verify <name>`is used to verify the selected name variable and show what the tool will actually delete by marking them with `-> Remove` in the list that it prints to the screen. This way you can test the result before deleting anything.
 
-`./certutil -delete <name>` does what is says. Be careful with the name attribute. Use at your own risk!
+`./certutil -delete <name>` deletes all certificates from Keychain which have name variable in their CN. Be careful with the name attribute. Use at your own risk!
+
+`./certutil -delete_exp <name>` deletes all expired certificates from Keychain which have name variable in their CN. Be careful with the name attribute. Use at your own risk!
 
 `./certutil -count <name>` counts the number of certificates with the given full or substring of CN.
+
+`./certutil -count <name>` counts the number of expired certificates with the given full or substring of CN.
 
 Examples:
 ```
