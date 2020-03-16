@@ -61,7 +61,7 @@ extension SecCertificate {
     /// Return certificate's expiration date as a number
     /// - returns:
     ///     - Double: Certificate's expiration date as a number since 2001
-    func getExpirationDate() -> Double {
+    func getExpirationDateAsDouble() -> Double {
         
         let key = [kSecOIDX509V1ValidityNotAfter]
         
@@ -92,11 +92,11 @@ extension SecCertificate {
         return dateAsOf2001
     }
     
-    /// Convert Double value (since 2001 / NSDate) to a Date
+    /// Convert Double value (since 2001 / NSDate) to a String
     /// - returns:
-    ///     - Date: Date
-    func getDateFromIntSince2001(since2001: Double) -> String {
-        
+    ///     - Date: String
+    func getDateFromDoubleSince2001(since2001: Double) -> String {
+
         let date = NSDate(timeIntervalSinceReferenceDate: since2001) as Date
         let dateFormatter = DateFormatter()
         
@@ -138,19 +138,19 @@ struct CertificateUtils {
         }
     }
     
-    /// Sort array of SecCertificates in descending order based of expiration dates
+    /// Sort array of SecCertificates in descending order based on expiration dates
     /// - parameters:
     ///   - [SecCertificate]: An array of SecCertificate objects
     /// - returns:
     ///   - [SecCertificate]: A sorted array of SecCertificate objects in descending order
     func sortCertificatesDescendingExpirationDate(certificates: [SecCertificate]) -> [SecCertificate] {
         
-        let sorted = certificates.sorted(by: { $0.getExpirationDate() > $1.getExpirationDate()})
+        let sorted = certificates.sorted(by: { $0.getExpirationDateAsDouble() > $1.getExpirationDateAsDouble()})
         
         return sorted
     }
     
-    /// Leave the certificate with the latest expiration date but delete the rest
+    /// Leave the certificate with the most recent expiration date but delete the rest
     /// - parameters:
     ///   - [SecCertificate]: An array of SecCertificate objects
     func deleteOldestCertificates(certificates: [SecCertificate]) {
@@ -173,5 +173,45 @@ struct CertificateUtils {
                 SecItemDelete(deleteQuery as CFDictionary)
             }
         }
+    }
+
+    /// Delete all expired certificates
+    /// - parameters:
+    ///   - [SecCertificate]: An array of expired SecCertificate objects
+    func deleteExpiredCertificates(certificates: [SecCertificate]) {
+        
+        let expiredCertificates = certificates
+        
+        for certificate in expiredCertificates {
+            
+            let deleteQuery: [String: Any] =  [
+                kSecClass as String : kSecClassCertificate,
+                kSecMatchLimit as String : kSecMatchLimitOne,
+                kSecValueRef as String: certificate
+            ]
+            SecItemDelete(deleteQuery as CFDictionary)
+        }
+    }
+
+    /// List all expired certificates
+    /// - parameters:
+    ///   - [SecCertificate]: An array of SecCertificate objects
+    func listExpiredCertificates(certificates: [SecCertificate]) -> [SecCertificate] {
+        
+        var expiredCertificates: [SecCertificate] = []
+        let currentDate = Date()
+        var expirationDate: Date
+        
+        for certificate in certificates {
+            
+            expirationDate = NSDate(timeIntervalSinceReferenceDate: certificate.getExpirationDateAsDouble()) as Date
+            
+            // If the certificate has expired, add it to an array
+            if(currentDate > expirationDate) {
+                expiredCertificates.append(certificate)
+            }
+        }
+        
+        return expiredCertificates
     }
 }
