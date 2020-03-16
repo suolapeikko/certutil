@@ -31,7 +31,7 @@ The whole idea of the tool is to remove copies of the certificates that are not 
 
 `./certutil -count <name>` counts the number of certificates with the given full or substring of CN.
 
-`./certutil -count <name>` counts the number of expired certificates with the given full or substring of CN.
+`./certutil -count_exp <name>` counts the number of expired certificates with the given full or substring of CN.
 
 Examples:
 ```
