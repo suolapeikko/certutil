@@ -200,12 +200,14 @@ struct CertificateUtils {
             let certificate = identity.getCertificate()!
             let privateKey = identity.getPrivateKey()
             let publicKey = identity.getPublicKey(privateKey: privateKey)
-            let cn = certificate.getCN()!
+            let cn = certificate.getCN()
             let dateAsDouble = certificate.getExpirationDateAsDouble()
             let dateAsString = certificate.getDateFromDoubleSince2001(since2001: dateAsDouble)
             
-            let processedIdentity = IdentityContainer(certificate: certificate, privateKey: privateKey, publicKey: publicKey, cn: cn, dateAsString: dateAsString, dateAsMillisecondsSinceJan2001: dateAsDouble)
-                processedIdentities.append(processedIdentity)
+            if(cn != nil && dateAsDouble != 0) {
+                let processedIdentity = IdentityContainer(certificate: certificate, privateKey: privateKey, publicKey: publicKey, cn: cn!, dateAsString: dateAsString, dateAsMillisecondsSinceJan2001: dateAsDouble)
+                    processedIdentities.append(processedIdentity)
+            }
         }
         
         return processedIdentities
