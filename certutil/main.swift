@@ -19,25 +19,24 @@ if(argCount == 3) {
         
     case "-list":
         
-        let certificates = certificateUtils.sortCertificatesDescendingExpirationDate(certificates: certificateUtils.findCertificatesFromKeychain(subjectContains: args[2]))
+        let identities = certificateUtils.sortIdentitiesDescendingExpirationDate(identities: certificateUtils.findIdentitiesFromKeychain(subjectContains: args[2]))
 
-        for certificate in certificates {
-            let cn = certificate.getCN() ?? "Unknown"
-            let dateStr = certificate.getDateFromDoubleSince2001(since2001: certificate.getExpirationDateAsDouble())
-            print("CN=\(cn), Expiration: \(dateStr)")
+        for identity in identities {
+            
+            print("CN=\(identity.cn), Expiration: \(identity.dateAsString)")
         }
         
         errorFlag = false
 
-        case "-list_exp":
+    case "-list_exp":
             
-            let certificates = certificateUtils.sortCertificatesDescendingExpirationDate(certificates: certificateUtils.findCertificatesFromKeychain(subjectContains: args[2]))
-            
-            let expiredCertificates = certificateUtils.listExpiredCertificates(certificates: certificates)
+            let identities = certificateUtils.sortIdentitiesDescendingExpirationDate(identities: certificateUtils.findIdentitiesFromKeychain(subjectContains: args[2]))
 
-            for certificate in expiredCertificates {
-                let cn = certificate.getCN() ?? "Unknown"
-                let dateStr = certificate.getDateFromDoubleSince2001(since2001: certificate.getExpirationDateAsDouble())
+            let expiredIdentities = certificateUtils.listExpiredIdentities(identities: identities)
+
+            for identity in expiredIdentities {
+                let cn = identity.cn
+                let dateStr = identity.dateAsString
                 print("CN=\(cn), Expiration: \(dateStr)")
             }
             
@@ -46,11 +45,11 @@ if(argCount == 3) {
     case "-verify":
         
         var index = 0
-        let certificates = certificateUtils.sortCertificatesDescendingExpirationDate(certificates: certificateUtils.findCertificatesFromKeychain(subjectContains: args[2]))
-        
-        for certificate in certificates {
-            let cn = certificate.getCN() ?? "Unknown"
-            let date = certificate.getDateFromDoubleSince2001(since2001: certificate.getExpirationDateAsDouble())
+        let identities = certificateUtils.sortIdentitiesDescendingExpirationDate(identities: certificateUtils.findIdentitiesFromKeychain(subjectContains: args[2]))
+
+        for identity in identities {
+            let cn = identity.cn
+            let date = identity.dateAsString
             
             if(index > 0) {
                 print("CN=\(cn), Expiration: \(date.description) -> Delete")
@@ -62,15 +61,15 @@ if(argCount == 3) {
         }
         
         errorFlag = false
-        
+      
     case "-delete":
 
         var index = 0
-        let certificates = certificateUtils.sortCertificatesDescendingExpirationDate(certificates: certificateUtils.findCertificatesFromKeychain(subjectContains: args[2]))
+        let identities = certificateUtils.sortIdentitiesDescendingExpirationDate(identities: certificateUtils.findIdentitiesFromKeychain(subjectContains: args[2]))
 
-        for certificate in certificates {
-            let cn = certificate.getCN() ?? "Unknown"
-            let date = certificate.getDateFromDoubleSince2001(since2001: certificate.getExpirationDateAsDouble())
+        for identity in identities {
+            let cn = identity.cn
+            let date = identity.dateAsString
             
             if(index > 0) {
                 print("CN=\(cn), Expiration: \(date.description) -> Deleting")
@@ -81,38 +80,40 @@ if(argCount == 3) {
             index += 1
         }
 
-        certificateUtils.deleteOldestCertificates(certificates: certificates)
+        certificateUtils.deleteOldestIdentities(identities: identities)
         
         
         errorFlag = false
 
-        case "-delete_exp":
+        
+    case "-delete_exp":
 
-            let certificates = certificateUtils.sortCertificatesDescendingExpirationDate(certificates: certificateUtils.findCertificatesFromKeychain(subjectContains: args[2]))
-            let expiredCertificates = certificateUtils.listExpiredCertificates(certificates: certificates)
+        let identities = certificateUtils.sortIdentitiesDescendingExpirationDate(identities: certificateUtils.findIdentitiesFromKeychain(subjectContains: args[2]))
 
-            for certificate in expiredCertificates {
-                let cn = certificate.getCN() ?? "Unknown"
-                let date = certificate.getDateFromDoubleSince2001(since2001: certificate.getExpirationDateAsDouble())
-                print("CN=\(cn), Expiration: \(date.description) -> Deleting")
-            }
+        let expiredIdentities = certificateUtils.listExpiredIdentities(identities: identities)
 
-            certificateUtils.deleteOldestCertificates(certificates: certificates)
-            
-            
-            errorFlag = false
+        for identity in expiredIdentities {
+            let cn = identity.cn
+            let date = identity.dateAsString
+            print("CN=\(cn), Expiration: \(date.description) -> Deleting")
+        }
+
+        certificateUtils.deleteExpiredIdentities(identities: expiredIdentities)
+        
+        
+        errorFlag = false
 
     case "-count":
         
-        print("Total amount of certificates having '\(args[2])' in CN: \(certificateUtils.findCertificatesFromKeychain(subjectContains: args[2]).count)")
+        print("Total amount of certificates having '\(args[2])' in CN: \(certificateUtils.findIdentitiesFromKeychain(subjectContains: args[2]).count)")
 
         errorFlag = false
 
     case "-count_exp":
         
-        let certificates = certificateUtils.findCertificatesFromKeychain(subjectContains: args[2])
+        let identities = certificateUtils.findIdentitiesFromKeychain(subjectContains: args[2])
         
-        print("Total amount of expired certificates having '\(args[2])' in CN: \(certificateUtils.listExpiredCertificates(certificates: certificates).count)")
+        print("Total amount of expired certificates having '\(args[2])' in CN: \(certificateUtils.listExpiredIdentities(identities: identities).count)")
 
         errorFlag = false
 

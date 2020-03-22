@@ -8,10 +8,65 @@
 
 import Foundation
 
-enum CertificateCheckError: Error {
-    case message(String)
+// Generic error class for CertUtil
+enum CertUtilError: Error {
+    case runtimeError(String)
 }
 
+// Adding helper functions to SecIdentity
+extension SecIdentity {
+     
+    /// Return associated certificate object from security identity
+    ///     https://developer.apple.com/documentation/security/1401305-secidentitycopycertificate
+    /// - returns:
+    ///   - SecCertificate?: Security certificate
+    ///     https://developer.apple.com/documentation/security/seccertificate
+    func getCertificate() -> SecCertificate? {
+        
+        var certificate: SecCertificate?
+        
+        let status = SecIdentityCopyCertificate(self, &certificate)
+        guard status == errSecSuccess else { return nil }
+        
+        return certificate
+    }
+
+    /// Return associated private key object from security identity
+    ///     https://developer.apple.com/documentation/security/1392978-secidentitycopyprivatekey
+    /// - returns:
+    ///   - SecKey?: Private key
+    ///     https://developer.apple.com/documentation/security/seckey
+    func getPrivateKey() -> SecKey? {
+        
+        var privateKey: SecKey?
+        let status = SecIdentityCopyPrivateKey(self, &privateKey)
+        guard status == errSecSuccess else { return nil }
+
+        return privateKey
+    }
+
+    /// Return calculated public key based on the private key
+    ///     https://developer.apple.com/documentation/security/1643774-seckeycopypublickey
+    /// - returns:
+    ///   - SecKey?: Public key
+    ///     https://developer.apple.com/documentation/security/seckey
+    func getPublicKey(privateKey: SecKey?) -> SecKey? {
+        
+        guard privateKey != nil else {
+            return nil
+        }
+        
+        // If private key does not have associated public key in the Keychain, this will return nil
+        guard let publicKey = SecKeyCopyPublicKey(privateKey!) else {
+            
+            return nil
+        }
+        
+        return publicKey
+    }
+}
+
+// Adding helper fucntions to SecCertificate
 extension SecCertificate {
     
     /// Return certificate's OID values
@@ -107,17 +162,64 @@ extension SecCertificate {
     }
 }
 
-struct CertificateUtils {
+// Helper data container
+struct IdentityContainer {
     
-    /// Find certificates from Keychain based on the subject name of the certificate
+    var certificate: SecCertificate
+    var privateKey: SecKey?
+    var publicKey: SecKey?
+    var cn: String
+    var dateAsString: String
+    var dateAsMillisecondsSinceJan2001: Double
+    
+    init(certificate: SecCertificate, privateKey: SecKey?, publicKey: SecKey?, cn: String, dateAsString: String, dateAsMillisecondsSinceJan2001: Double) {
+        
+        self.certificate = certificate
+        self.privateKey = privateKey
+        self.publicKey = publicKey
+        self.cn = cn
+        self.dateAsString = dateAsString
+        self.dateAsMillisecondsSinceJan2001 = dateAsMillisecondsSinceJan2001
+    }
+}
+
+// Main functionality
+struct CertificateUtils {
+
+    /// Validate identities to more easily handled ValidateIdentity array
+    /// - parameters:
+    ///   - SecIdentity: An array of security identities
+    /// - returns:
+    ///   - [IdentityContainer]: An array of identities
+    func validateIdentities(identities: [SecIdentity]) -> [IdentityContainer] {
+
+        var processedIdentities: [IdentityContainer] = []
+        
+        for identity in identities {
+            
+            let certificate = identity.getCertificate()!
+            let privateKey = identity.getPrivateKey()
+            let publicKey = identity.getPublicKey(privateKey: privateKey)
+            let cn = certificate.getCN()!
+            let dateAsDouble = certificate.getExpirationDateAsDouble()
+            let dateAsString = certificate.getDateFromDoubleSince2001(since2001: dateAsDouble)
+            
+            let processedIdentity = IdentityContainer(certificate: certificate, privateKey: privateKey, publicKey: publicKey, cn: cn, dateAsString: dateAsString, dateAsMillisecondsSinceJan2001: dateAsDouble)
+                processedIdentities.append(processedIdentity)
+        }
+        
+        return processedIdentities
+    }
+    
+    /// Find security identities from Keychain based on the subject name of the certificate
     /// - parameters:
     ///   - String: Either partial or whole subject name of the certificate
     /// - returns:
-    ///   - [SecCertificate]: An array of certificates
-    func findCertificatesFromKeychain(subjectContains: String) -> [SecCertificate] {
+    ///   - [IdentityContainer]: An array of validated identities
+    func findIdentitiesFromKeychain(subjectContains: String) -> [IdentityContainer] {
         
         let searchQuery: [String: Any] =  [
-            kSecClass as String : kSecClassCertificate,
+            kSecClass as String : kSecClassIdentity,
             kSecMatchSubjectContains as String : subjectContains,
             kSecMatchLimit as String : kSecMatchLimitAll,
             kSecReturnRef as String: kCFBooleanTrue as Any
@@ -129,89 +231,133 @@ struct CertificateUtils {
         
         if status == errSecSuccess, let retrievedData = data as! NSArray? {
             
-            let swiftArr: [SecCertificate] = retrievedData.compactMap({ ($0 as! SecCertificate) })
+            let identities: [SecIdentity] = retrievedData.compactMap({ ($0 as! SecIdentity) })
             
-            return swiftArr
+            return validateIdentities(identities: identities)
         }
         else {
             return []
         }
     }
     
-    /// Sort array of SecCertificates in descending order based on expiration dates
+    /// Sort array of processed identities in descending order based on expiration dates
     /// - parameters:
-    ///   - [SecCertificate]: An array of SecCertificate objects
+    ///   - [SecIdentity]: An array of SecIdentity objects
     /// - returns:
-    ///   - [SecCertificate]: A sorted array of SecCertificate objects in descending order
-    func sortCertificatesDescendingExpirationDate(certificates: [SecCertificate]) -> [SecCertificate] {
+    ///   - [IdentityContainer]: A sorted array of identity objects in descending order
+    func sortIdentitiesDescendingExpirationDate(identities: [IdentityContainer]) -> [IdentityContainer] {
         
-        let sorted = certificates.sorted(by: { $0.getExpirationDateAsDouble() > $1.getExpirationDateAsDouble()})
-        
+        let sorted = identities.sorted(by: {
+            $0.dateAsMillisecondsSinceJan2001 > $1.dateAsMillisecondsSinceJan2001
+        })
+
         return sorted
     }
     
-    /// Leave the certificate with the most recent expiration date but delete the rest
+    /// Leave the identity with the most recent expiration date but delete the rest
     /// - parameters:
-    ///   - [SecCertificate]: An array of SecCertificate objects
-    func deleteOldestCertificates(certificates: [SecCertificate]) {
+    ///   - [IdentityContainer]: An array of processed identity objects
+    func deleteOldestIdentities(identities: [IdentityContainer]) {
         
-        var sortedCertificates = certificates
+        var mutableIdentities = identities
         
-        // If we have more than 1 certificate, we need to delete something
-        if(sortedCertificates.count > 1) {
+        // If we have more than 1 identity, we need to delete something
+        if(mutableIdentities.count > 1) {
             
             // Remove the first item from the sorted array, as it is the one with the latest expiration date
-            sortedCertificates.removeFirst()
+            mutableIdentities.removeFirst()
             
-            for certificate in sortedCertificates {
+            for identity in mutableIdentities {
                 
-                let deleteQuery: [String: Any] =  [
+                // SecCertificate item
+                let deleteCertificateQuery: [String: Any] =  [
                     kSecClass as String : kSecClassCertificate,
                     kSecMatchLimit as String : kSecMatchLimitOne,
-                    kSecValueRef as String: certificate
+                    kSecValueRef as String: identity.certificate
                 ]
-                SecItemDelete(deleteQuery as CFDictionary)
+                SecItemDelete(deleteCertificateQuery as CFDictionary)
+
+                // SecKey item (private key)
+                if(identity.privateKey != nil) {
+                    let deletePrivateKeyQuery: [String: Any] =  [
+                        kSecClass as String : kSecClassKey,
+                        kSecMatchLimit as String : kSecMatchLimitOne,
+                        kSecValueRef as String: identity.privateKey!
+                    ]
+                    SecItemDelete(deletePrivateKeyQuery as CFDictionary)
+                }
+
+                // SecKey item (public key)
+                if(identity.publicKey != nil) {
+                    let deletePublicKeyQuery: [String: Any] =  [
+                        kSecClass as String : kSecClassKey,
+                        kSecMatchLimit as String : kSecMatchLimitOne,
+                        kSecValueRef as String: identity.publicKey!
+                    ]
+                    SecItemDelete(deletePublicKeyQuery as CFDictionary)
+                }
             }
         }
     }
 
-    /// Delete all expired certificates
+    /// Delete all expired identities
     /// - parameters:
-    ///   - [SecCertificate]: An array of expired SecCertificate objects
-    func deleteExpiredCertificates(certificates: [SecCertificate]) {
+    ///   - [IdentityContainer]: An array of expired identity objects
+    func deleteExpiredIdentities(identities: [IdentityContainer]) {
         
-        let expiredCertificates = certificates
+        let mutableIdentities = identities
         
-        for certificate in expiredCertificates {
+        for identity in mutableIdentities {
             
-            let deleteQuery: [String: Any] =  [
+            // SecCertificate item
+            let deleteCertificateQuery: [String: Any] =  [
                 kSecClass as String : kSecClassCertificate,
                 kSecMatchLimit as String : kSecMatchLimitOne,
-                kSecValueRef as String: certificate
+                kSecValueRef as String: identity.certificate
             ]
-            SecItemDelete(deleteQuery as CFDictionary)
+            SecItemDelete(deleteCertificateQuery as CFDictionary)
+
+            // SecKey item (private key)
+            if(identity.privateKey != nil) {
+                let deletePrivateKeyQuery: [String: Any] =  [
+                    kSecClass as String : kSecClassKey,
+                    kSecMatchLimit as String : kSecMatchLimitOne,
+                    kSecValueRef as String: identity.privateKey!
+                ]
+                SecItemDelete(deletePrivateKeyQuery as CFDictionary)
+            }
+
+            // SecKey item (public key)
+            if(identity.publicKey != nil) {
+                let deletePublicKeyQuery: [String: Any] =  [
+                    kSecClass as String : kSecClassKey,
+                    kSecMatchLimit as String : kSecMatchLimitOne,
+                    kSecValueRef as String: identity.publicKey!
+                ]
+                SecItemDelete(deletePublicKeyQuery as CFDictionary)
+            }
         }
     }
 
-    /// List all expired certificates
+    /// List all expired identities
     /// - parameters:
-    ///   - [SecCertificate]: An array of SecCertificate objects
-    func listExpiredCertificates(certificates: [SecCertificate]) -> [SecCertificate] {
+    ///   - [IdentityContainer]: An array of identity objects
+    func listExpiredIdentities(identities: [IdentityContainer]) -> [IdentityContainer] {
         
-        var expiredCertificates: [SecCertificate] = []
+        var expiredIdentities: [IdentityContainer] = []
         let currentDate = Date()
         var expirationDate: Date
         
-        for certificate in certificates {
+        for identity in identities {
             
-            expirationDate = NSDate(timeIntervalSinceReferenceDate: certificate.getExpirationDateAsDouble()) as Date
+            expirationDate = NSDate(timeIntervalSinceReferenceDate: identity.dateAsMillisecondsSinceJan2001) as Date
             
             // If the certificate has expired, add it to an array
             if(currentDate > expirationDate) {
-                expiredCertificates.append(certificate)
+                expiredIdentities.append(identity)
             }
         }
         
-        return expiredCertificates
+        return expiredIdentities
     }
 }
