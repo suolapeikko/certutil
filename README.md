@@ -17,7 +17,7 @@ certutil: Command line utility for listing and cleaning certificates from Keycha
 ```
 
 Options:
-The whole idea of the tool is to remove copies of the certificates that are not used, thus leaving only the latest one to the keychain.
+The whole idea of the tool is to remove copies of defined certificates and associated private (and possible public) keys that are not used, thus leaving only the latest one to the macOS's Keychain.
 
 `./certutil -list <name>` searches keychain for all certificates which have name variable in their CN. For example, it will match both "Developer ID Application: Antti" and "Developer ID Installer: Antti". The idea of the tool is to not restrict user to do only exact matches.
 
