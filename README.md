@@ -1,5 +1,5 @@
 # certutil
-macOS command line tool for removing multiple copies of the same certificate from macOS's Keychain.
+macOS command line tool for removing multiple copies of the same certificate and associated key(s) from macOS's Keychain.
 
 Usage:
 ```
