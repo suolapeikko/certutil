@@ -1,5 +1,5 @@
 # certutil
-macOS command line tool for removing multiple copies of the same certificate and associated key(s) from macOS's Keychain.
+macOS command line tool for deleting expired/duplicate/not used certificates and associated private keys from Keychain. The idea of certutil is to always leave the most recent certificate in Keychain.
 
 ## Usage:
 ```
