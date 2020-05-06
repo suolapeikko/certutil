@@ -62,8 +62,8 @@ CN=antti@antti.com, Expiration: 14. Mar 2021 15:01:17
 
 antti@my-mbp ~ % certutil -verify "@antti.com"
 CN=antti@antti.com, Expiration: 14. Mar 2021 15:26:59 -> Keep
-CN=antti@antti.com, Expiration: 14. Mar 2021 15:26:44 -> Remove
-CN=antti@antti.com, Expiration: 14. Mar 2021 15:01:17 -> Remove
+CN=antti@antti.com, Expiration: 14. Mar 2021 15:26:44 -> Delete
+CN=antti@antti.com, Expiration: 14. Mar 2021 15:01:17 -> Delete
 
 antti@my-mbp ~ % certutil -delete "@antti.com" 
 CN=antti@antti.com, Expiration: 14. Mar 2021 15:26:59 -> Keeping
