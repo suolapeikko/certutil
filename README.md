@@ -4,7 +4,7 @@ macOS command line tool for deleting expired/duplicate/not used certificates and
 ## Usage:
 ```
 $ ./certutil
-certutil: Command line utility for listing and cleaning certificates from Keychain (Version 3.0)
+certutil: Command line utility for listing and cleaning certificates from Keychain (Version 4.1)
 
    Usage:
    certutil -list <name>           List all certificates with <name> in CN
