@@ -1,7 +1,7 @@
 # certutil
 macOS command line tool for removing multiple copies of the same certificate and associated key(s) from macOS's Keychain.
 
-Usage:
+## Usage:
 ```
 $ ./certutil
 certutil: Command line utility for listing and cleaning certificates from Keychain (Version 3.0)
@@ -16,7 +16,7 @@ certutil: Command line utility for listing and cleaning certificates from Keycha
    certutil -count_exp <name>      Count all expired certificates with <name> in CN
 ```
 
-Options:
+## Options:
 The whole idea of the tool is to remove copies of defined certificates and associated private (and possible public) keys that are not used, thus leaving only the latest one to the macOS's Keychain.
 
 `./certutil -list <name>` searches keychain for all certificates which have name variable in their CN. For example, it will match both "Developer ID Application: Antti" and "Developer ID Installer: Antti". The idea of the tool is to not restrict user to do only exact matches.
@@ -33,21 +33,21 @@ The whole idea of the tool is to remove copies of defined certificates and assoc
 
 `./certutil -count_exp <name>` counts the number of expired certificates with the given full or substring of CN.
 
-How to get started:
+## How to get started:
 ```
-# Download the latest certutil from GitHub
-curl -OL https://github.com/suolapeikko/certutil/releases/download/4.0/CertUtil-4.1.pkg
+Download the latest certutil from GitHub
+`curl -OL https://github.com/suolapeikko/certutil/releases/download/4.0/CertUtil-4.1.pkg`
 
-# Install certutil to /usr/local/bin
-sudo installer -package CertUtil-4.1.pkg -target /
+Install certutil to /usr/local/bin
+`sudo installer -package CertUtil-4.1.pkg -target /`
 
-# Make a test run with "-verify" command
-certutil -verify "your_cn_value_here"
+Make a test run with "-verify" command
+`certutil -verify "your_cn_value_here"
 
-# You should make a backup copy of your Keychain before running "-delete" command in case something goes wrong
-sudo cp -Rpf ~/Library/Keychains ~/Desktop
+You should make a backup copy of your Keychain before running "-delete" command in case something goes wrong
+`sudo cp -Rpf ~/Library/Keychains ~/Desktop`
 
-Usage examples:
+## Usage examples:
 ```
 antti@my-mbp ~ % certutil -count "@antti.com"
 Total amount of certificates having '@antti.com' in CN: 3
