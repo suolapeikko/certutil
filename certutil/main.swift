@@ -123,7 +123,7 @@ if(argCount == 3) {
 }
 
 if(errorFlag) {
-    print("certutil: Command line utility for listing and cleaning certificates from Keychain (Version 4.0)\n")
+    print("certutil: Command line utility for listing and cleaning certificates from Keychain (Version 4.1)\n")
     print("   Usage:")
     print("   certutil -list <name>           List all certificates with <name> in CN")
     print("   certutil -list_exp <name>       List all expired certificates with <name> in CN")

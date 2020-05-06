@@ -193,9 +193,11 @@ struct CertificateUtils {
     ///   - [IdentityContainer]: An array of identities
     func validateIdentities(identities: [SecIdentity]) -> [IdentityContainer] {
 
+        let noDuplicateIdentities = Array(Set(identities))
+
         var processedIdentities: [IdentityContainer] = []
         
-        for identity in identities {
+        for identity in noDuplicateIdentities {
             
             let certificate = identity.getCertificate()!
             let privateKey = identity.getPrivateKey()
