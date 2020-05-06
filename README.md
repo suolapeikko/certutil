@@ -34,19 +34,19 @@ The whole idea of the tool is to remove copies of defined certificates and assoc
 `./certutil -count_exp <name>` counts the number of expired certificates with the given full or substring of CN.
 
 ## How to get started:
-Download the latest certutil from GitHub
+Download the latest certutil from GitHub:
 
 `curl -OL https://github.com/suolapeikko/certutil/releases/download/4.0/CertUtil-4.1.pkg`
 
-Install certutil to `/usr/local/bin`
+Install certutil to /usr/local/bin:
 
 `sudo installer -package CertUtil-4.1.pkg -target /`
 
-Make a test run with "-verify" command
+Make a test run with "-verify" command:
 
 `certutil -verify "your_cn_value_here"`
 
-You should make a backup copy of your Keychain before running "-delete" command in case something goes wrong
+You should make a backup copy of your Keychain before running "-delete" command in case something goes wrong:
 
 `sudo cp -Rpf ~/Library/Keychains ~/Desktop`
 
