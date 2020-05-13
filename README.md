@@ -36,7 +36,7 @@ The whole idea of the tool is to remove copies of defined certificates and assoc
 ## How to get started:
 Download the latest certutil from GitHub:
 
-`curl -OL https://github.com/suolapeikko/certutil/releases/download/4.0/CertUtil-4.1.pkg`
+`curl -OL https://github.com/suolapeikko/certutil/releases/download/4.1/CertUtil-4.1.pkg`
 
 Install certutil to /usr/local/bin:
 
