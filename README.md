@@ -1,6 +1,8 @@
 # certutil
 macOS command line tool for deleting expired/duplicate/not used certificates and associated private keys from Keychain. The idea of certutil is to always leave the most recent certificate in Keychain.
 
+If you are running macOS 10.3 (High Sierra) or below, you need to install [Swift 5 Runtime Support for Command Line Tools](https://support.apple.com/kb/DL1998?locale=en_US) to run certutil.
+
 ## Usage:
 ```
 $ ./certutil
